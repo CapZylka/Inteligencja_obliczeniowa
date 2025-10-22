@@ -69,7 +69,7 @@
 
 ---
 
-## Test 4: "Niemożliwy"
+## Test 4:
 
 * **Graf:** `grafy/graph_2.json`
 * **Wierzchołki:** 30

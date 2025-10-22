@@ -6,16 +6,13 @@ import os
 
 KATALOG_WYNIKOW = "wyniki"
 
-
 def wczytaj_graf_z_pliku(filepath):
     try:
         with open(filepath, 'r') as f:
             data = json.load(f)
-            # Podstawowa walidacja
             if "liczba_wierzcholkow" not in data or "krawedzie" not in data:
                 print(f"Błąd: Plik {filepath} ma niepoprawny format.", file=sys.stderr)
                 sys.exit(1)
-            # Konwersja krawędzi z list JSON na krotki (tuples), na wypadek gdyby json.load() ich nie utworzył
             data["krawedzie"] = [tuple(krawedz) for krawedz in data["krawedzie"]]
             return data
     except FileNotFoundError:
@@ -28,7 +25,7 @@ def wczytaj_graf_z_pliku(filepath):
         print(f"Wystąpił nieoczekiwany błąd przy wczytywaniu pliku: {e}", file=sys.stderr)
         sys.exit(1)
 
-# --- FUNKCJE ALGORYTMU GENETYCZNEGO ---
+# FUNKCJE ALGORYTMU GENETYCZNEGO
 
 def stworz_osobnika(liczba_wierzcholkow, liczba_kolorow):
 
@@ -99,7 +96,7 @@ def mutacja(osobnik, p_mutacji, liczba_kolorow):
             
     return zmutowany_osobnik
 
-# --- GŁÓWNA FUNKCJA URUCHOMIENIOWA ---
+# GŁÓWNA FUNKCJA URUCHOMIENIOWA
 
 def uruchom_ga(graf, liczba_kolorow, rozmiar_populacji, liczba_generacji, p_krzyzowania, p_mutacji, rozmiar_turnieju):
 
@@ -178,7 +175,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    print("Start eksperymentu: Algorytm Genetyczny dla Kolorowania Grafu.")
+    print("Start eksperymentu")
     
     # Konfiguracja
     WYBRANY_GRAF = wczytaj_graf_z_pliku(args.sciezka_do_grafu)
@@ -204,9 +201,9 @@ if __name__ == "__main__":
 
     print(f"Testowany Graf: {args.sciezka_do_grafu}")
     print(f"  > {WYBRANY_GRAF['liczba_wierzcholkow']} wierzchołków, {len(WYBRANY_GRAF['krawedzie'])} krawędzi.")
-    print(f"Cel: Pokolorować używając {LICZBA_KOLOROW_DO_TESTU} kolorów (min. konfliktów).")
+    print(f"Liczba kolorów: {LICZBA_KOLOROW_DO_TESTU}")
     
-    # --- ZAPISYWANIE WYNIKÓW ---
+    # ZAPISYWANIE WYNIKÓW 
     wszystkie_wyniki = {
         "info_eksperymentu": {
             "graf": args.sciezka_do_grafu,
@@ -220,7 +217,7 @@ if __name__ == "__main__":
         "wyniki_strategii": []
     }
     
-    # --- Pętla eksperymentu ---
+    # PĘTLA EKSPERYMENTU
     for zestaw in zestawy_parametrow:
         print(f"\n--- TEST: {zestaw['nazwa']} (PK={zestaw['p_krzyzowania']}, PM={zestaw['p_mutacji']}) ---")
         
@@ -228,7 +225,7 @@ if __name__ == "__main__":
         historie_uruchomien = [] # Zapisywanie historycznych wyników
         
         for i in range(LICZBA_URUCHOMIEN_NA_ZESTAW):
-            # Uruchamianie głównego skryptu (wydobycie 3 głównych wyników)
+            # Uruchamianie głównego skryptu
             najlepszy, konflikty, historia = uruchom_ga(
                 graf=WYBRANY_GRAF,
                 liczba_kolorow=LICZBA_KOLOROW_DO_TESTU,
@@ -239,9 +236,9 @@ if __name__ == "__main__":
                 rozmiar_turnieju=PODSTAWOWE_PARAMETRY["rozmiar_turnieju"]
             )
             
-            print(f"  Uruchomienie {i+1}: Znaleziono rozwiązanie z {konflikty} konfliktami.")
+            print(f"Uruchomienie {i+1}: Znaleziono rozwiązanie z {konflikty} konfliktami.")
             if konflikty == 0:
-                print(f"    -> Idealne rozwiązanie: {najlepszy}")
+                print(f"-> Idealne rozwiązanie: {najlepszy}")
             
             wyniki_konfliktow.append(konflikty)
             historie_uruchomien.append(historia) # Zapisz historię z tego uruchomienia
@@ -258,9 +255,9 @@ if __name__ == "__main__":
         srednia_konfliktow_final = sum(wyniki_konfliktow) / len(wyniki_konfliktow)
         najlepszy_wynik = min(wyniki_konfliktow)
         
-        print(f"  Podsumowanie dla '{zestaw['nazwa']}':")
-        print(f"  > Najlepszy wynik (min. konfliktów): {najlepszy_wynik}")
-        print(f"  > Średnia liczba konfliktów: {srednia_konfliktow_final:.2f}")
+        print(f"Podsumowanie dla '{zestaw['nazwa']}':")
+        print(f"> Najlepszy wynik (min. konfliktów): {najlepszy_wynik}")
+        print(f"> Średnia liczba konfliktów: {srednia_konfliktow_final:.2f}")
         
         # Dodaj do wyników strategii
         wszystkie_wyniki["wyniki_strategii"].append({
@@ -272,7 +269,7 @@ if __name__ == "__main__":
             "srednia_historia_zbieznosci": srednia_historia # Dodaj uśredniony wykres
         })
 
-    # --- ZAPIS WYNIKÓW DO PLIKU ---
+    # ZAPIS WYNIKÓW DO PLIKU
     
     # Tworzenie nazwy odpowiedniej dla testu
     basename_grafu = os.path.basename(args.sciezka_do_grafu)
